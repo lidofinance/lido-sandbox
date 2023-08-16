@@ -1,10 +1,11 @@
 from objects.node_operator import NodeOperator, NodeOperatorSummary
 from min_first_allocation_strategy import MinFirstAllocationStrategy
+from locator import Locator
 from time import time
 
 
 class StakingModule:
-    _lido = None
+    _locator: Locator
 
     _node_operators: dict[int, NodeOperator]
     _node_operator_summary: NodeOperatorSummary
@@ -19,9 +20,9 @@ class StakingModule:
     MAX_UINT64 = 2**64 - 1
     MAX_NODE_OPERATORS_COUNT: int = 200
 
-    def __init__(self, type: str, lido, address: str) -> None:
+    def __init__(self, type: str, locator: Locator, address: str) -> None:
         self._type = type
-        self._lido = lido
+        self._locator = locator
         self._address = address
         self._node_operators = {}
         self._node_operator_summary = NodeOperatorSummary()
@@ -253,8 +254,8 @@ class StakingModule:
         self._distribute_rewards()
 
     def _distribute_rewards(self) -> int:
-        lido = self._lido
-        _, burner = lido.locator.burner
+        _, lido = self._locator.lido
+        _, burner = self._locator.burner
 
         shares_to_distribute = lido.shares_of(self._address)
         if shares_to_distribute == 0:

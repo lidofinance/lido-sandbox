@@ -1,14 +1,15 @@
 from min_first_allocation_strategy import MinFirstAllocationStrategy
+from locator import Locator
+from staking_module import StakingModule
 from objects.staking_module import (
     StakingModuleData,
     StakingModuleStatus,
     StakingModuleCache,
 )
-from staking_module import StakingModule
 
 
 class StakingRouter:
-    _lido = None
+    _locator: Locator
 
     _withdrawal_credentials: str = "withdrawal_credentials"
     _staking_module_indices_mapping: dict[int, int]
@@ -22,9 +23,9 @@ class StakingRouter:
     DEPOSIT_SIZE: int = 32 * 10**18
     MAX_STAKING_MODULES_COUNT: int = 32
 
-    def __init__(self, lido):
+    def __init__(self, locator: Locator):
         self._withdrawal_credentials = "lido_withdrawal_credentials"
-        self._lido = lido
+        self._locator = locator
         self._staking_module_indices_mapping = {}
         self._staking_modules_mapping = {}
         self._staking_modules = {}
@@ -67,8 +68,7 @@ class StakingRouter:
         )
         self._last_staking_module_id = new_staking_module.id
         self._staking_modules_count = new_staking_module_index + 1
-
-        self._staking_modules[staking_module_address] = StakingModule('some_type', self._lido, staking_module_address)
+        self._staking_modules[staking_module_address] = StakingModule('some_type', self._locator, staking_module_address)
 
         return new_staking_module.id, new_staking_module_index
 
