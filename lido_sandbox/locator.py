@@ -1,15 +1,15 @@
 class Locator:
     def __init__(self):
-        from accounting_oracle import AccountingOracle
-        from burner import Burner
-        from el_rewards_vault import ElRewardsVault
-        from lido import Lido
-        from oracle_report_sanity_checker import OracleReportSanityChecker
-        from post_token_rebase_receiver import PostTokenRebaseReceiver
-        from staking_router import StakingRouter
-        from treasury import Treasury
-        from withdrawal_queue import WithdrawalQueue
-        from withdrawal_vault import WithdrawalVault
+        from lido_sandbox.accounting_oracle import AccountingOracle
+        from lido_sandbox.burner import Burner
+        from lido_sandbox.el_rewards_vault import ElRewardsVault
+        from lido_sandbox.lido import Lido
+        from lido_sandbox.oracle_report_sanity_checker import OracleReportSanityChecker
+        from lido_sandbox.post_token_rebase_receiver import PostTokenRebaseReceiver
+        from lido_sandbox.staking_router import StakingRouter
+        from lido_sandbox.treasury import Treasury
+        from lido_sandbox.withdrawal_queue import WithdrawalQueue
+        from lido_sandbox.withdrawal_vault import WithdrawalVault
 
         self.accounting_oracle = "accounting_oracle", AccountingOracle()
         self.burner = "burner", Burner()

@@ -1,6 +1,6 @@
-from objects.node_operator import NodeOperator, NodeOperatorSummary
-from min_first_allocation_strategy import MinFirstAllocationStrategy
-from locator import Locator
+from lido_sandbox.objects import NodeOperator, NodeOperatorSummary
+from lido_sandbox.min_first_allocation_strategy import MinFirstAllocationStrategy
+from lido_sandbox.locator import Locator
 from time import time
 
 

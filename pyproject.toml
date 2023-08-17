@@ -1,0 +1,28 @@
+[project]
+name = "lido-sandbox"
+version = "0.0.1"
+description = "Lido python scripts"
+authors = [{name = "George A", email = "george.a@lido.fi"}]
+requires-python = ">=3.10"
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["*"]
+exclude = []
+
+[tool.black]
+include = "\\.pyi?$"
+exclude = '''
+/(
+  \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''

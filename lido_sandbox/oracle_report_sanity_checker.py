@@ -1,6 +1,5 @@
-from positve_token_rebase_limiter import PositiveTokenRebaseLimiter
-from objects.token_rebase_limiter_data import TokenRebaseLimiterData
-from objects.limits_list_packed import LimitsListPacked
+from lido_sandbox.positve_token_rebase_limiter import PositiveTokenRebaseLimiter
+from lido_sandbox.objects import LimitsListPacked, TokenRebaseLimiterData
 
 
 class OracleReportSanityChecker:

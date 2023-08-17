@@ -1,7 +1,7 @@
-from min_first_allocation_strategy import MinFirstAllocationStrategy
-from locator import Locator
-from staking_module import StakingModule
-from objects.staking_module import (
+from lido_sandbox.min_first_allocation_strategy import MinFirstAllocationStrategy
+from lido_sandbox.locator import Locator
+from lido_sandbox.staking_module import StakingModule
+from lido_sandbox.objects import (
     StakingModuleData,
     StakingModuleStatus,
     StakingModuleCache,

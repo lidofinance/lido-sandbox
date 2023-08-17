@@ -1,7 +1,5 @@
+from lido_sandbox.objects import BatchesCalculationState, Checkpoint, WithdrawalRequest, WithdrawalRequestStatus
 from collections import defaultdict
-from objects.batches_calculation_state import BatchesCalculationState
-from objects.checkpoint import Checkpoint
-from objects.withdrawal_request import WithdrawalRequest, WithdrawalRequestStatus
 from time import time
 
 class WithdrawalQueue:

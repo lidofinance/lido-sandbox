@@ -1,4 +1,4 @@
-from objects.token_rebase_limiter_data import TokenRebaseLimiterData
+from lido_sandbox.objects import TokenRebaseLimiterData
 
 
 class PositiveTokenRebaseLimiter:

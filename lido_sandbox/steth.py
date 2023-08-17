@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-class stETH:
+class StETH:
     _shares: dict[str, int]
     _allowances: dict[str, dict[str, int]]
     _total_shares: int = 0

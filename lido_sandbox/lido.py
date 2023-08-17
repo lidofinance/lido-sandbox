@@ -1,13 +1,11 @@
-from steth import stETH
-from staking_router import StakingRouter
-from locator import Locator
-from objects.staking_rewards_distribution import StakingRewardsDistribution
-from objects.oracle_report_context import OracleReportContext
-from objects.oracle_reported_data import OracleReportedData
-from post_token_rebase_receiver import PostTokenRebaseReceiver
+from lido_sandbox.steth import StETH
+from lido_sandbox.staking_router import StakingRouter
+from lido_sandbox.locator import Locator
+from lido_sandbox.objects import OracleReportContext, OracleReportedData, StakingRewardsDistribution
+from lido_sandbox.post_token_rebase_receiver import PostTokenRebaseReceiver
 
 
-class Lido(stETH):
+class Lido(StETH):
     balance: int = 0
 
     _buffered_ether: int = 0
