@@ -1,2 +1,4 @@
+from lido_sandbox.helpers.print_global_lido_statistic import print_global_lido_statistic
+from lido_sandbox.helpers.print_lido_stakers import print_lido_stakers
 from lido_sandbox.helpers.print_table import print_table
 from lido_sandbox.helpers.wei_to_eth import wei_to_eth
