@@ -42,7 +42,7 @@ class StakingModule:
         )
 
         return id
-    
+
     def activate_node_operator(self, node_operator_id: int) -> None:
         assert not self.get_node_operator_is_active(node_operator_id)
 
@@ -57,8 +57,13 @@ class StakingModule:
         self._active_node_operators_count -= 1
         node_operator.active = False
 
-        if node_operator.vetted_signing_keys_count > node_operator.deposited_signing_keys_count:
-            node_operator.vetted_signing_keys_count = node_operator.deposited_signing_keys_count
+        if (
+            node_operator.vetted_signing_keys_count
+            > node_operator.deposited_signing_keys_count
+        ):
+            node_operator.vetted_signing_keys_count = (
+                node_operator.deposited_signing_keys_count
+            )
             self._update_summary_max_validators_count(node_operator_id)
 
         self._increase_validators_keys_nonce()
@@ -68,19 +73,24 @@ class StakingModule:
         assert node_operator.name != name, "SAME_NAME"
         node_operator.name = name
 
-    def set_node_operator_reward_address(self, node_operator_id: int, reward_address: str) -> None:
+    def set_node_operator_reward_address(
+        self, node_operator_id: int, reward_address: str
+    ) -> None:
         node_operator = self._node_operators[node_operator_id]
         assert node_operator.reward_address != reward_address, "SAME_REWARD_ADDRESS"
         node_operator.reward_address = reward_address
 
-    def set_node_operator_staking_limit(self, node_operator_id: int, vetted_signing_keys_count: int) -> None:
+    def set_node_operator_staking_limit(
+        self, node_operator_id: int, vetted_signing_keys_count: int
+    ) -> None:
         node_operator = self._node_operators[node_operator_id]
         vetted_signing_keys_count_before = node_operator.vetted_signing_keys_count
         deposited_signing_keys_count = node_operator.deposited_signing_keys_count
         total_signing_keys_count = node_operator.total_signing_keys_count
 
         vetted_signing_keys_count_after = min(
-            total_signing_keys_count, max(vetted_signing_keys_count, deposited_signing_keys_count)
+            total_signing_keys_count,
+            max(vetted_signing_keys_count, deposited_signing_keys_count),
         )
 
         if vetted_signing_keys_count_after == vetted_signing_keys_count_before:
@@ -90,10 +100,14 @@ class StakingModule:
         self._update_summary_max_validators_count(node_operator_id)
         self._increase_validators_keys_nonce()
 
-    def add_signing_keys(self, node_operator_id: int, keys: list[tuple[str, str]]) -> None:
+    def add_signing_keys(
+        self, node_operator_id: int, keys: list[tuple[str, str]]
+    ) -> None:
         self._add_signing_keys(node_operator_id, keys)
 
-    def _add_signing_keys(self, node_operator_id: int, keys: list[tuple[str, str]]) -> None:
+    def _add_signing_keys(
+        self, node_operator_id: int, keys: list[tuple[str, str]]
+    ) -> None:
         keys_count = len(keys)
 
         assert self.MAX_UINT64 >= keys_count > 0, "INVALID_KEYS_COUNT"
@@ -101,7 +115,9 @@ class StakingModule:
         node_operator = self._node_operators[node_operator_id]
         total_signing_keys_count = node_operator.total_signing_keys_count
 
-        assert self.MAX_UINT64 >= total_signing_keys_count + keys_count, "INVALID_TOTAL_KEYS_COUNT"
+        assert (
+            self.MAX_UINT64 >= total_signing_keys_count + keys_count
+        ), "INVALID_TOTAL_KEYS_COUNT"
 
         if node_operator_id in self._signing_keys_mapping:
             self._signing_keys_mapping[node_operator_id] += keys
@@ -343,15 +359,22 @@ class StakingModule:
 
     def is_operator_penalty_cleared(self, node_operator_id: int) -> bool:
         node_operator = self._node_operators[node_operator_id]
-        return not self._is_operator_penalized(node_operator_id) and node_operator.stuck_penalty_end_timestamp == 0
+        return (
+            not self._is_operator_penalized(node_operator_id)
+            and node_operator.stuck_penalty_end_timestamp == 0
+        )
 
     def _increase_validators_keys_nonce(self) -> None:
         self._nonce += 1
 
-    def _get_signing_keys_allocation_data(self, keys_count: int) -> tuple[int, list[int], list[int]]:
+    def _get_signing_keys_allocation_data(
+        self, keys_count: int
+    ) -> tuple[int, list[int], list[int]]:
         active_node_operators_count: int = self.get_active_node_operators_count()
         node_operator_ids: list[int] = [None] * active_node_operators_count
-        active_key_counts_after_allocation: list[int] = [None] * active_node_operators_count
+        active_key_counts_after_allocation: list[int] = [
+            None
+        ] * active_node_operators_count
         active_keys_capacities: list[int] = [None] * active_node_operators_count
 
         active_node_operator_index: int = 0
@@ -361,12 +384,21 @@ class StakingModule:
             node_operator = self._node_operators[node_operator_id]
 
             # the node operator has no available signing keys
-            if node_operator.deposited_signing_keys_count == node_operator.max_validators_count:
+            if (
+                node_operator.deposited_signing_keys_count
+                == node_operator.max_validators_count
+            ):
                 continue
 
             node_operator_ids[active_node_operator_index] = node_operator_id
-            active_key_counts_after_allocation[active_node_operator_index] = node_operator.deposited_signing_keys_count - node_operator.exited_signing_keys_count
-            active_keys_capacities[active_node_operator_index] = node_operator.max_validators_count - node_operator.exited_signing_keys_count
+            active_key_counts_after_allocation[active_node_operator_index] = (
+                node_operator.deposited_signing_keys_count
+                - node_operator.exited_signing_keys_count
+            )
+            active_keys_capacities[active_node_operator_index] = (
+                node_operator.max_validators_count
+                - node_operator.exited_signing_keys_count
+            )
             active_node_operator_index += 1
 
         if active_node_operator_index == 0:
@@ -375,15 +407,23 @@ class StakingModule:
         # shrink the length of the resulting arrays if some active node operators have no available keys to be deposited
         if active_node_operator_index < active_node_operators_count:
             node_operator_ids = node_operator_ids[:active_node_operator_index]
-            active_key_counts_after_allocation = active_key_counts_after_allocation[:active_node_operator_index]
+            active_key_counts_after_allocation = active_key_counts_after_allocation[
+                :active_node_operator_index
+            ]
             active_keys_capacities = active_keys_capacities[:active_node_operator_index]
 
-        allocated_keys_count = MinFirstAllocationStrategy.allocate(active_key_counts_after_allocation, active_keys_capacities, keys_count)
+        allocated_keys_count = MinFirstAllocationStrategy.allocate(
+            active_key_counts_after_allocation, active_keys_capacities, keys_count
+        )
 
         # method NEVER allocates more keys than was requested
         assert keys_count >= allocated_keys_count
 
-        return allocated_keys_count, node_operator_ids, active_key_counts_after_allocation
+        return (
+            allocated_keys_count,
+            node_operator_ids,
+            active_key_counts_after_allocation,
+        )
 
     def _load_allocated_signing_keys(
         self,
@@ -436,8 +476,7 @@ class StakingModule:
         return pubkeys, signatures
 
     def _update_exited_validators_count(
-        self,
-        node_operator_id: int, exited_validators_count: int, allow_decrease: bool
+        self, node_operator_id: int, exited_validators_count: int, allow_decrease: bool
     ) -> None:
         node_operator = self._node_operators[node_operator_id]
         cur_exited_validators_count = node_operator.exited_signing_keys_count
@@ -451,14 +490,21 @@ class StakingModule:
 
         # sustain invariant exited + stuck <= deposited
         assert deposited_validators_count >= stuck_validators_count
-        assert exited_validators_count <= deposited_validators_count - stuck_validators_count
+        assert (
+            exited_validators_count
+            <= deposited_validators_count - stuck_validators_count
+        )
 
         node_operator.exited_signing_keys_count = exited_validators_count
 
-        self._node_operator_summary.exited_keys_count += exited_validators_count - cur_exited_validators_count
+        self._node_operator_summary.exited_keys_count += (
+            exited_validators_count - cur_exited_validators_count
+        )
         self._update_summary_max_validators_count(node_operator_id)
 
-    def _update_stuck_validators_count(self, node_operator_id: int, stuck_validators_count: int) -> None:
+    def _update_stuck_validators_count(
+        self, node_operator_id: int, stuck_validators_count: int
+    ) -> None:
         node_operator = self._node_operators[node_operator_id]
         cur_stuck_validators_count = node_operator.exited_signing_keys_count
         if stuck_validators_count == cur_stuck_validators_count:
@@ -469,16 +515,26 @@ class StakingModule:
 
         # sustain invariant exited + stuck <= deposited
         assert deposited_validators_count >= exited_validators_count
-        assert stuck_validators_count <= deposited_validators_count - exited_validators_count
+        assert (
+            stuck_validators_count
+            <= deposited_validators_count - exited_validators_count
+        )
 
         cur_refunded_validators_count = node_operator.refunded_validators_count
-        if stuck_validators_count <= cur_refunded_validators_count and cur_stuck_validators_count > cur_refunded_validators_count:
-            node_operator.stuck_penalty_end_timestamp = int(time()) + self.get_stuck_penalty_delay()
+        if (
+            stuck_validators_count <= cur_refunded_validators_count
+            and cur_stuck_validators_count > cur_refunded_validators_count
+        ):
+            node_operator.stuck_penalty_end_timestamp = (
+                int(time()) + self.get_stuck_penalty_delay()
+            )
 
         node_operator.stuck_validators_count = stuck_validators_count
         self._update_summary_max_validators_count(node_operator_id)
 
-    def _update_refund_validators_keys_count(self, node_operator_id: int, refunded_validators_count: int) -> None:
+    def _update_refund_validators_keys_count(
+        self, node_operator_id: int, refunded_validators_count: int
+    ) -> None:
         node_operator = self._node_operators[node_operator_id]
         cur_refunded_validators_count = node_operator.refunded_validators_count
         if refunded_validators_count == cur_refunded_validators_count:
@@ -487,19 +543,29 @@ class StakingModule:
         assert refunded_validators_count <= node_operator.deposited_signing_keys_count
 
         cur_stuck_validators_count = node_operator.stuck_validators_count
-        if refunded_validators_count >= cur_stuck_validators_count and cur_refunded_validators_count < cur_stuck_validators_count:
-            node_operator.stuck_penalty_end_timestamp = int(time()) + self.get_stuck_penalty_delay()
+        if (
+            refunded_validators_count >= cur_stuck_validators_count
+            and cur_refunded_validators_count < cur_stuck_validators_count
+        ):
+            node_operator.stuck_penalty_end_timestamp = (
+                int(time()) + self.get_stuck_penalty_delay()
+            )
 
         node_operator.refunded_validators_count = refunded_validators_count
         self._update_summary_max_validators_count(node_operator_id)
 
     def _update_summary_max_validators_count(self, node_operator_id: int) -> None:
-        old_max_signing_keys_count, new_max_signing_keys_count = self._apply_node_operator_limits(node_operator_id)
+        (
+            old_max_signing_keys_count,
+            new_max_signing_keys_count,
+        ) = self._apply_node_operator_limits(node_operator_id)
 
         if new_max_signing_keys_count == old_max_signing_keys_count:
             return
 
-        self._node_operator_summary.max_validators_count += new_max_signing_keys_count - old_max_signing_keys_count
+        self._node_operator_summary.max_validators_count += (
+            new_max_signing_keys_count - old_max_signing_keys_count
+        )
 
     def _apply_node_operator_limits(self, node_operator_id: int) -> tuple[int, int]:
         node_operator = self._node_operators[node_operator_id]
@@ -524,8 +590,9 @@ class StakingModule:
                     new_max_signing_keys_count,
                     # SafeMath.add() isn't used below because the sum is always
                     # less or equal to 2 * UINT64_MAX
-                    node_operator.exited_signing_keys_count + node_operator.target_validators_count
-                )
+                    node_operator.exited_signing_keys_count
+                    + node_operator.target_validators_count,
+                ),
             )
 
         old_max_signing_keys_count = node_operator.max_validators_count
@@ -536,4 +603,3 @@ class StakingModule:
 
     def get_stuck_penalty_delay(self):
         return self._stuck_penalty_delay
-

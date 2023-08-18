@@ -68,7 +68,9 @@ class StakingRouter:
         )
         self._last_staking_module_id = new_staking_module.id
         self._staking_modules_count = new_staking_module_index + 1
-        self._staking_modules[staking_module_address] = StakingModule('some_type', self._locator, staking_module_address)
+        self._staking_modules[staking_module_address] = StakingModule(
+            "some_type", self._locator, staking_module_address
+        )
 
         return new_staking_module.id, new_staking_module_index
 
@@ -387,13 +389,17 @@ class StakingRouter:
     def get_withdrawal_credentials(self) -> str:
         return self._withdrawal_credentials
 
-    def deposit(self, deposit_value: int, deposits_count: int, staking_module_id: int) -> None:
+    def deposit(
+        self, deposit_value: int, deposits_count: int, staking_module_id: int
+    ) -> None:
         module_data = self._get_staking_module_by_id(staking_module_id)
         assert module_data.status == StakingModuleStatus.Active
         assert deposit_value == deposits_count * self.DEPOSIT_SIZE
 
         if deposits_count > 0:
-            module = self.get_staking_module_instance(module_data.staking_module_address)
+            module = self.get_staking_module_instance(
+                module_data.staking_module_address
+            )
             module.obtain_deposit_data(deposits_count)
 
     def _load_staking_modules_cache(self) -> tuple[int, list[StakingModuleCache]]:
@@ -494,7 +500,9 @@ class StakingRouter:
     def _set_staking_module_index_by_id(
         self, staking_module_id: int, staking_module_index: int
     ) -> None:
-        self._staking_module_indices_mapping[staking_module_id] = staking_module_index + 1
+        self._staking_module_indices_mapping[staking_module_id] = (
+            staking_module_index + 1
+        )
 
     def _get_staking_module_by_id(self, staking_module_id: int) -> StakingModuleData:
         return self._get_staking_module_by_index(

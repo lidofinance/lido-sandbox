@@ -4,7 +4,7 @@ version = "0.0.1"
 description = "Lido python scripts"
 authors = [{name = "George A", email = "george.a@lido.fi"}]
 requires-python = ">=3.10"
-dependencies = []
+dependencies = ["pandas", "jinja2"]
 
 [tool.setuptools.packages.find]
 where = ["."]

@@ -1,9 +1,11 @@
 from enum import Enum
 
+
 class StakingModuleStatus(Enum):
     Active = 0
     DepositsPaused = 1
     Stopped = 2
+
 
 class StakingModuleData:
     def __init__(
@@ -15,7 +17,7 @@ class StakingModuleData:
         target_share: int,
         status: int,
         name: str,
-        exited_validators_count: int
+        exited_validators_count: int,
     ):
         self.id = id
         self.staking_module_address = staking_module_address
@@ -25,6 +27,7 @@ class StakingModuleData:
         self.status = status
         self.name = name
         self.exited_validators_count = exited_validators_count
+
 
 class StakingModuleCache:
     def __init__(
@@ -36,7 +39,7 @@ class StakingModuleCache:
         target_share: int,
         status: int,
         active_validators_count: int,
-        available_validators_count: int
+        available_validators_count: int,
     ):
         self.staking_module_address = staking_module_address
         self.staking_module_id = staking_module_id

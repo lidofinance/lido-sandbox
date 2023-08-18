@@ -1,4 +1,4 @@
-class Burner():
+class Burner:
     def __init__(self) -> None:
         pass
 

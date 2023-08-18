@@ -1,6 +1,12 @@
-from lido_sandbox.objects import BatchesCalculationState, Checkpoint, WithdrawalRequest, WithdrawalRequestStatus
+from lido_sandbox.objects import (
+    BatchesCalculationState,
+    Checkpoint,
+    WithdrawalRequest,
+    WithdrawalRequestStatus,
+)
 from collections import defaultdict
 from time import time
+
 
 class WithdrawalQueue:
     _is_bunker = False
@@ -13,7 +19,7 @@ class WithdrawalQueue:
     _locked_ether_amount: int = 0
     _last_checkpoint_index: int = 0
 
-    E27_PRECISION_BASE: int = 10 ** 27
+    E27_PRECISION_BASE: int = 10**27
     MAX_BATCHES_LENGTH: int = 36
     NOT_FOUND: int = 0
 
@@ -42,14 +48,17 @@ class WithdrawalQueue:
 
     def unfinalized_steth(self) -> int:
         queue = self._get_queue()
-        return queue[self.get_last_request_id()].cumulative_steth - queue[self.get_last_finalized_request_id()].cumulative_steth
+        return (
+            queue[self.get_last_request_id()].cumulative_steth
+            - queue[self.get_last_finalized_request_id()].cumulative_steth
+        )
 
     def calculate_finalization_batches(
         self,
         max_share_rate: int,
         max_timestamp: int,
         max_requests_per_call: int,
-        state: BatchesCalculationState
+        state: BatchesCalculationState,
     ) -> BatchesCalculationState:
         assert not state.finished and state.remaining_eth_budget != 0
 
@@ -79,7 +88,9 @@ class WithdrawalQueue:
             if request.timestamp > max_timestamp:
                 break  # max timestamp break
 
-            request_share_rate, eth_to_finalize, shares = self._calc_batch(prev_request, request)
+            request_share_rate, eth_to_finalize, shares = self._calc_batch(
+                prev_request, request
+            )
 
             if request_share_rate > max_share_rate:
                 # discounted
@@ -98,10 +109,13 @@ class WithdrawalQueue:
                 )
                 or (
                     # both requests are above the line
-                    prev_request_share_rate > max_share_rate and request_share_rate > max_share_rate
+                    prev_request_share_rate > max_share_rate
+                    and request_share_rate > max_share_rate
                 )
             ):
-                state.batches[state.batches_length - 1] = current_id  # extend the last batch
+                state.batches[
+                    state.batches_length - 1
+                ] = current_id  # extend the last batch
             else:
                 # to be able to check batches on-chain we need array to have limited length
                 if state.batches_length == self.MAX_BATCHES_LENGTH:
@@ -140,7 +154,9 @@ class WithdrawalQueue:
             assert batch_end_request_id > prev_batch_end_request_id
 
             batch_end = self._get_queue()[batch_end_request_id]
-            batch_share_rate, steth, shares = self._calc_batch(prev_batch_end, batch_end)
+            batch_share_rate, steth, shares = self._calc_batch(
+                prev_batch_end, batch_end
+            )
 
             if batch_share_rate > max_share_rate:
                 # discounted
@@ -156,7 +172,12 @@ class WithdrawalQueue:
 
         return eth_to_lock, shares_to_burn
 
-    def _finalize(self, last_request_id_to_be_finalized: int, amount_of_eth: int, max_share_rate: int) -> None:
+    def _finalize(
+        self,
+        last_request_id_to_be_finalized: int,
+        amount_of_eth: int,
+        max_share_rate: int,
+    ) -> None:
         assert last_request_id_to_be_finalized <= self.get_last_request_id()
         last_finalized_request_id = self.get_last_finalized_request_id()
         assert last_request_id_to_be_finalized > last_finalized_request_id
@@ -164,14 +185,19 @@ class WithdrawalQueue:
         last_finalized_request = self._get_queue()[last_finalized_request_id]
         request_to_finalize = self._get_queue()[last_request_id_to_be_finalized]
 
-        steth_to_finalize = request_to_finalize.cumulative_steth - last_finalized_request.cumulative_steth
+        steth_to_finalize = (
+            request_to_finalize.cumulative_steth
+            - last_finalized_request.cumulative_steth
+        )
         assert amount_of_eth <= steth_to_finalize
 
         first_request_id_to_finalize = last_finalized_request_id + 1
         last_checkpoint_index = self.get_last_checkpoint_index()
 
         # add a new checkpoint with current finalization max share rate
-        self._get_checkpoints()[last_checkpoint_index + 1] = Checkpoint(first_request_id_to_finalize, max_share_rate)
+        self._get_checkpoints()[last_checkpoint_index + 1] = Checkpoint(
+            first_request_id_to_finalize, max_share_rate
+        )
         self._set_last_checkpoint_index(last_checkpoint_index + 1)
 
         self._set_locked_ether_amount(self.get_locked_ether_amount() + amount_of_eth)
@@ -194,7 +220,7 @@ class WithdrawalQueue:
             owner,
             int(time()),
             False,
-            self._get_last_report_timestamp()
+            self._get_last_report_timestamp(),
         )
         self._get_queue()[request_id] = new_request
         assert self._get_requests_by_owner()[owner].add(request_id)
@@ -213,7 +239,7 @@ class WithdrawalQueue:
             request.owner,
             request.timestamp,
             request_id <= self.get_last_finalized_request_id(),
-            request.claimed
+            request.claimed,
         )
         return status
 
@@ -223,7 +249,11 @@ class WithdrawalQueue:
         last_checkpoint_index = self.get_last_checkpoint_index()
         assert start != 0 and end <= last_checkpoint_index
 
-        if last_checkpoint_index == 0 or request_id > self.get_last_finalized_request_id() or start > end:
+        if (
+            last_checkpoint_index == 0
+            or request_id > self.get_last_finalized_request_id()
+            or start > end
+        ):
             return self.NOT_FOUND
 
         # Right boundary
@@ -265,14 +295,16 @@ class WithdrawalQueue:
         self.locked_ether_amount -= eth_with_discount
         self._send_value(recipient, eth_with_discount)
 
-    def _calculate_claimable_ether(self, request: WithdrawalRequest, request_id: int, hint: int) -> int:
+    def _calculate_claimable_ether(
+        self, request: WithdrawalRequest, request_id: int, hint: int
+    ) -> int:
         assert hint != 0
 
         last_checkpoint_index = self.get_last_checkpoint_index()
         assert hint <= last_checkpoint_index
 
         checkpoint = self._get_checkpoints()[hint]
-        
+
         assert request_id >= checkpoint.from_request_id
         if hint < last_checkpoint_index:
             next_checkpoint = self._get_checkpoints()[hint + 1]
@@ -295,19 +327,21 @@ class WithdrawalQueue:
     def _send_value(self, recipient: str, amount: int) -> None:
         pass
 
-    def calc_batch(self, pre_start_request: WithdrawalRequest, end_request: WithdrawalRequest) -> tuple[int, int, int]:
+    def calc_batch(
+        self, pre_start_request: WithdrawalRequest, end_request: WithdrawalRequest
+    ) -> tuple[int, int, int]:
         steth = end_request.cumulative_steth - pre_start_request.cumulative_steth
         shares = end_request.cumulative_shares - pre_start_request.cumulative_shares
         share_rate = steth * self.E27_PRECISION_BASE // shares
         return share_rate, steth, shares
 
-    def _get_queue(self)-> dict[int, WithdrawalRequest]:
+    def _get_queue(self) -> dict[int, WithdrawalRequest]:
         return self._queue
 
-    def _get_checkpoints(self)-> dict[int, Checkpoint]:
+    def _get_checkpoints(self) -> dict[int, Checkpoint]:
         return self._checkpoints
 
-    def _get_requests_by_owner(self)-> dict[str, set[WithdrawalRequest]]:
+    def _get_requests_by_owner(self) -> dict[str, set[WithdrawalRequest]]:
         return self._request_by_owner
 
     def _get_last_report_timestamp(self) -> int:
@@ -327,4 +361,3 @@ class WithdrawalQueue:
 
     def _set_last_report_timestamp(self, last_report_timestamp: int) -> None:
         self._last_report_timestamp = last_report_timestamp
-

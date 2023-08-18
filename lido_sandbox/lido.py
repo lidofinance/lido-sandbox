@@ -1,7 +1,11 @@
 from lido_sandbox.steth import StETH
 from lido_sandbox.staking_router import StakingRouter
 from lido_sandbox.locator import Locator
-from lido_sandbox.objects import OracleReportContext, OracleReportedData, StakingRewardsDistribution
+from lido_sandbox.objects import (
+    OracleReportContext,
+    OracleReportedData,
+    StakingRewardsDistribution,
+)
 from lido_sandbox.post_token_rebase_receiver import PostTokenRebaseReceiver
 
 
@@ -34,9 +38,7 @@ class Lido(StETH):
         withdrawal_queue_address, _ = self._locator.withdrawal_queue
         burner_address, _ = self._locator.burner
 
-        self._approve(
-            withdrawal_queue_address, burner_address, self.INFINITE_ALLOWANCE
-        )
+        self._approve(withdrawal_queue_address, burner_address, self.INFINITE_ALLOWANCE)
 
     def submit(self, sender: str, value: int):
         return self._submit(sender, value)

@@ -9,7 +9,7 @@ class OracleReportContext:
         shares_to_burn_from_withdrawal_queue: int = 0,
         simulated_shares_to_burn: int = 0,
         shares_to_burn: int = 0,
-        shares_minted_as_fees: int = 0
+        shares_minted_as_fees: int = 0,
     ):
         self.pre_cl_validators = pre_cl_validators
         self.pre_cl_balance = pre_cl_balance

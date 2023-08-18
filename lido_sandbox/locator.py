@@ -14,7 +14,7 @@ class Locator:
         self.accounting_oracle = "accounting_oracle", AccountingOracle()
         self.burner = "burner", Burner()
         self.el_rewards_vault = "el_rewards_vault", ElRewardsVault()
-        self.lido = 'lido', Lido(self)
+        self.lido = "lido", Lido(self)
         self.oracle_report_sanity_checker = (
             "oracle_report_sanity_checker",
             OracleReportSanityChecker(),
@@ -24,6 +24,6 @@ class Locator:
             PostTokenRebaseReceiver(),
         )
         self.staking_router = "staking_router", StakingRouter(self)
-        self.treasury = 'treasury', Treasury()
+        self.treasury = "treasury", Treasury()
         self.withdrawal_queue = "withdrawal_queue", WithdrawalQueue()
         self.withdrawal_vault = "withdrawal_vault", WithdrawalVault()

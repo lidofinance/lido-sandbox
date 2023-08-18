@@ -7,6 +7,6 @@ class PostTokenRebaseReceiver:
         pre_total_ether: int,
         post_total_shares: int,
         post_total_ether: int,
-        shares_minted_as_fees: int
+        shares_minted_as_fees: int,
     ):
         pass

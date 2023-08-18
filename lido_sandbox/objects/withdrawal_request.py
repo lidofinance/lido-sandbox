@@ -1,11 +1,12 @@
 from time import time
 
+
 class WithdrawalRequest:
     def __init__(
         self,
         cumulative_steth: int = 0,
         cumulative_shares: int = 0,
-        owner: str = 'nobody',
+        owner: str = "nobody",
         timestamp: int = int(time()),
         claimed: bool = True,
         report_timestamp: int = 0,
@@ -16,6 +17,7 @@ class WithdrawalRequest:
         self.timestamp = timestamp
         self.claimed = claimed
         self.report_timestamp = report_timestamp
+
 
 class WithdrawalRequestStatus:
     def __init__(

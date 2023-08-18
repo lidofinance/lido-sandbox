@@ -14,9 +14,15 @@ class LimitsListPacked:
         self.churn_validators_per_day_limit = churn_validators_per_day_limit
         self.one_off_cl_balance_decrease_bp_limit = one_off_cl_balance_decrease_bp_limit
         self.annual_balance_increase_bp_limit = annual_balance_increase_bp_limit
-        self.simulated_share_rate_deviation_bp_limit = simulated_share_rate_deviation_bp_limit
-        self.max_validator_exit_requests_per_report = max_validator_exit_requests_per_report
-        self.max_accounting_extra_data_list_items_count = max_accounting_extra_data_list_items_count
+        self.simulated_share_rate_deviation_bp_limit = (
+            simulated_share_rate_deviation_bp_limit
+        )
+        self.max_validator_exit_requests_per_report = (
+            max_validator_exit_requests_per_report
+        )
+        self.max_accounting_extra_data_list_items_count = (
+            max_accounting_extra_data_list_items_count
+        )
         self.max_node_operators_per_extra_data_item_count = (
             max_node_operators_per_extra_data_item_count
         )

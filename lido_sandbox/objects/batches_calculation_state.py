@@ -4,7 +4,7 @@ class BatchesCalculationState:
         remaining_eth_budget: int,
         finished: bool,
         batches: list[int],
-        batches_length: int
+        batches_length: int,
     ):
         self.remaining_eth_budget = remaining_eth_budget
         self.finished = finished
