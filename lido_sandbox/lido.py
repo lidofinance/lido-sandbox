@@ -23,8 +23,8 @@ class Lido(StETH):
 
     DEPOSIT_SIZE: int = 32 * 10**18
 
-    def __init__(self, locator):
-        super().__init__()
+    def __init__(self, locator: Locator, address: str):
+        super().__init__(address)
         self._locator = locator
 
     def get_buffered_ether(self) -> int:
@@ -35,10 +35,10 @@ class Lido(StETH):
         self._initialize_v2()
 
     def _initialize_v2(self):
-        withdrawal_queue_address, _ = self._locator.withdrawal_queue
-        burner_address, _ = self._locator.burner
+        withdrawal_queue = self._locator.withdrawal_queue
+        burner = self._locator.burner
 
-        self._approve(withdrawal_queue_address, burner_address, self.INFINITE_ALLOWANCE)
+        self._approve(withdrawal_queue.address, burner.address, self.INFINITE_ALLOWANCE)
 
     def submit(self, sender: str, value: int):
         return self._submit(sender, value)
@@ -82,11 +82,11 @@ class Lido(StETH):
         return self._deposited_validators, self._cl_validators, self._cl_balance
 
     def can_deposit(self) -> bool:
-        _, withdrawal_queue = self._locator.withdrawal_queue
+        withdrawal_queue = self._locator.withdrawal_queue
         return not withdrawal_queue.is_bunker_mode_active()
 
     def get_depositable_ether(self) -> int:
-        _, withdrawal_queue = self._locator.withdrawal_queue
+        withdrawal_queue = self._locator.withdrawal_queue
         buffered_ether = self._get_buffered_ether()
         withdrawal_reserve = withdrawal_queue.unfinalized_steth()
         return (
@@ -98,7 +98,7 @@ class Lido(StETH):
     def deposit(self, max_deposits_count: int, staking_module_id: int) -> None:
         assert self.can_deposit(), "CAN_NOT_DEPOSIT"
 
-        _, staking_router = self._locator.staking_router
+        staking_router = self._locator.staking_router
         deposits_count = min(
             max_deposits_count,
             staking_router.get_staking_module_max_deposits_count(
@@ -117,7 +117,7 @@ class Lido(StETH):
         staking_router.deposit(deposits_value, deposits_count, staking_module_id)
 
     def get_fee_distribution(self) -> tuple[int, int, int]:
-        _, staking_router = self._locator.staking_router
+        staking_router = self._locator.staking_router
         total_basis_points: int = staking_router.total_basis_points()
         total_fee: int = staking_router.get_total_fee_e4_precision()
         (
@@ -171,8 +171,8 @@ class Lido(StETH):
         simulated_share_rate: int,
         ether_to_lock_on_withdrawal_queue: int,
     ) -> None:
-        _, el_rewards_vault = self._locator.el_rewards_vault
-        _, withdrawal_vault = self._locator.withdrawal_vault
+        el_rewards_vault = self._locator.el_rewards_vault
+        withdrawal_vault = self._locator.withdrawal_vault
 
         if el_rewards_to_withdraw > 0:
             el_rewards_vault.withdraw_rewards(el_rewards_to_withdraw)
@@ -181,7 +181,7 @@ class Lido(StETH):
             withdrawal_vault.withdraw_withdrawals(withdrawals_to_withdraw)
 
         if ether_to_lock_on_withdrawal_queue > 0:
-            _, withdrawal_queue = self._locator.withdrawal_queue
+            withdrawal_queue = self._locator.withdrawal_queue
             withdrawal_queue.finalize(
                 withdrawal_finalization_batches[-1],
                 simulated_share_rate,
@@ -200,8 +200,8 @@ class Lido(StETH):
     def _calculate_withdrawals(
         self, reported_data: OracleReportedData
     ) -> tuple[int, int]:
-        _, withdrawal_queue = self._locator.withdrawal_queue
-        _, oracle_report_sanity_checker = self._locator.oracle_report_sanity_checker
+        withdrawal_queue = self._locator.withdrawal_queue
+        oracle_report_sanity_checker = self._locator.oracle_report_sanity_checker
 
         if not withdrawal_queue.is_paused():
             oracle_report_sanity_checker.check_withdrawal_queue_oracle_report(
@@ -248,7 +248,7 @@ class Lido(StETH):
     def _get_staking_rewards_distribution(
         self,
     ) -> tuple[StakingRewardsDistribution, StakingRouter]:
-        _, router = self._locator.staking_router
+        router = self._locator.staking_router
 
         (
             recipients,
@@ -288,8 +288,8 @@ class Lido(StETH):
                 )
             )
 
-            lido_address, _ = self._locator.lido
-            self._mint_shares(lido_address, shares_minted_as_fees)
+            lido = self._locator.lido
+            self._mint_shares(lido.address, shares_minted_as_fees)
 
             module_rewards, total_module_rewards = self._transfer_module_rewards(
                 rewards_distribution.recipients,
@@ -317,21 +317,21 @@ class Lido(StETH):
     ) -> tuple[list[int], int]:
         total_module_rewards = 0
         module_rewards = [0] * len(recipients)
-        lido_address, _ = self._locator.lido
+        lido = self._locator.lido
 
         for i in range(len(recipients)):
             if modules_fees[i] > 0:
                 i_module_rewards = total_rewards * modules_fees[i] // total_fee
                 module_rewards[i] = i_module_rewards
-                self._transfer_shares(lido_address, recipients[i], i_module_rewards)
+                self._transfer_shares(lido.address, recipients[i], i_module_rewards)
                 total_module_rewards += i_module_rewards
 
         return module_rewards, total_module_rewards
 
     def _transfer_treasury_rewards(self, treasury_reward: int) -> None:
-        lido_address, _ = self._locator.lido
-        treasury_address, _ = self._locator.treasury
-        self._transfer_shares(lido_address, treasury_address, treasury_reward)
+        lido = self._locator.lido
+        treasury = self._locator.treasury
+        self._transfer_shares(lido.address, treasury.address, treasury_reward)
 
     def _get_buffered_ether(self) -> int:
         return self._buffered_ether
@@ -353,10 +353,10 @@ class Lido(StETH):
     def _handle_oracle_report(
         self, reported_data: OracleReportedData
     ) -> tuple[int, int, int, int]:
-        withdrawal_queue_address, _ = self._locator.withdrawal_queue
-        burner_address, burner = self._locator.burner
-        _, oracle_report_sanity_checker = self._locator.oracle_report_sanity_checker
-        _, post_token_rebase_receiver = self._locator.post_token_rebase_receiver
+        withdrawal_queue = self._locator.withdrawal_queue
+        burner = self._locator.burner
+        oracle_report_sanity_checker = self._locator.oracle_report_sanity_checker
+        post_token_rebase_receiver = self._locator.post_token_rebase_receiver
 
         report_context = OracleReportContext()
 
@@ -387,7 +387,7 @@ class Lido(StETH):
 
             if report_context.shares_to_burn_from_withdrawal_queue > 0:
                 burner.request_burn_shares(
-                    withdrawal_queue_address,
+                    withdrawal_queue.address,
                     report_context.shares_to_burn_from_withdrawal_queue,
                 )
 
@@ -426,7 +426,7 @@ class Lido(StETH):
         # Burn the previously requested shares
         if report_context.shares_to_burn > 0:
             burner.commit_shares_to_burn(report_context.shares_to_burn)
-            self._burn_shares(burner_address, report_context.shares_to_burn)
+            self._burn_shares(burner.address, report_context.shares_to_burn)
 
         # Step 7.
         # Distribute protocol fee (treasury & node operators)
@@ -457,7 +457,7 @@ class Lido(StETH):
         reported_data: OracleReportedData,
         report_context: OracleReportContext,
     ) -> None:
-        _, oracle_report_sanity_checker = self._locator.oracle_report_sanity_checker
+        oracle_report_sanity_checker = self._locator.oracle_report_sanity_checker
 
         oracle_report_sanity_checker.check_accounting_oracle_report(
             reported_data.time_elapsed,

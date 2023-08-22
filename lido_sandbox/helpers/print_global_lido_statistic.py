@@ -4,8 +4,7 @@ import pandas as pd
 
 
 def print_global_lido_statistic(locator: Locator):
-    _, lido = locator.lido
-
+    lido = locator.lido
     deposited_validators, cl_validators, cl_balance = lido.get_beacon_stat()
 
     df = pd.DataFrame(

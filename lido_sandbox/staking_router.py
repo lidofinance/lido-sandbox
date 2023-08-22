@@ -1,4 +1,5 @@
-from lido_sandbox.min_first_allocation_strategy import MinFirstAllocationStrategy
+from lido_sandbox.libs import MinFirstAllocationStrategy
+from lido_sandbox.contract import Contract
 from lido_sandbox.locator import Locator
 from lido_sandbox.staking_module import StakingModule
 from lido_sandbox.objects import (
@@ -8,7 +9,7 @@ from lido_sandbox.objects import (
 )
 
 
-class StakingRouter:
+class StakingRouter(Contract):
     _locator: Locator
 
     _withdrawal_credentials: str = "withdrawal_credentials"
@@ -23,7 +24,9 @@ class StakingRouter:
     DEPOSIT_SIZE: int = 32 * 10**18
     MAX_STAKING_MODULES_COUNT: int = 32
 
-    def __init__(self, locator: Locator):
+    def __init__(self, locator: Locator, address: str):
+        super().__init__(address)
+
         self._withdrawal_credentials = "lido_withdrawal_credentials"
         self._locator = locator
         self._staking_module_indices_mapping = {}

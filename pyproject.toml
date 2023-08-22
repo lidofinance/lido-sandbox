@@ -9,7 +9,7 @@ dependencies = ["pandas", "jinja2"]
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["*"]
-exclude = []
+exclude = ["build"]
 
 [tool.black]
 include = "\\.pyi?$"

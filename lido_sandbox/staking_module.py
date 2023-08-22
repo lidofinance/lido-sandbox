@@ -1,10 +1,11 @@
 from lido_sandbox.objects import NodeOperator, NodeOperatorSummary
-from lido_sandbox.min_first_allocation_strategy import MinFirstAllocationStrategy
+from lido_sandbox.libs import MinFirstAllocationStrategy
 from lido_sandbox.locator import Locator
+from lido_sandbox.contract import Contract
 from time import time
 
 
-class StakingModule:
+class StakingModule(Contract):
     _locator: Locator
 
     _node_operators: dict[int, NodeOperator]
@@ -14,16 +15,16 @@ class StakingModule:
     _signing_keys_mapping: dict[int, tuple[str, str]]
     _nonce: int = 0
     _type: str
-    _address: str
     _stuck_penalty_delay: int = 30
 
     MAX_UINT64 = 2**64 - 1
     MAX_NODE_OPERATORS_COUNT: int = 200
 
     def __init__(self, type: str, locator: Locator, address: str) -> None:
+        super().__init__(address)
+
         self._type = type
         self._locator = locator
-        self._address = address
         self._node_operators = {}
         self._node_operator_summary = NodeOperatorSummary()
         self._signing_keys_mapping = {}
@@ -270,10 +271,10 @@ class StakingModule:
         self._distribute_rewards()
 
     def _distribute_rewards(self) -> int:
-        _, lido = self._locator.lido
-        _, burner = self._locator.burner
+        lido = self._locator.lido
+        burner = self._locator.burner
 
-        shares_to_distribute = lido.shares_of(self._address)
+        shares_to_distribute = lido.shares_of(self.address)
         if shares_to_distribute == 0:
             return 0
 
@@ -291,11 +292,11 @@ class StakingModule:
                 shares[idx] >>= 1
                 to_burn += shares[idx]
 
-            lido.transfer_shares(self._address, recipients[idx], shares[idx])
+            lido.transfer_shares(self.address, recipients[idx], shares[idx])
             distributed += shares[idx]
 
         if to_burn > 0:
-            burner.request_burn_shares(self._address, to_burn)
+            burner.request_burn_shares(self.address, to_burn)
         return distributed
 
     def get_rewards_distribution(

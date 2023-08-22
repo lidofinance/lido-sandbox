@@ -4,7 +4,7 @@ import pandas as pd
 
 
 def print_lido_stakers(locator: Locator):
-    _, lido = locator.lido
+    lido = locator.lido
 
     df = pd.DataFrame(
         {

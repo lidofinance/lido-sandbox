@@ -1,7 +1,8 @@
 from collections import defaultdict
+from lido_sandbox.contract import Contract
 
 
-class StETH:
+class StETH(Contract):
     _shares: dict[str, int]
     _allowances: dict[str, dict[str, int]]
     _total_shares: int = 0
@@ -9,7 +10,9 @@ class StETH:
     INFINITE_ALLOWANCE: int = 2**256 - 1
     INITIAL_TOKEN_HOLDER: str = "0xdead"
 
-    def __init__(self) -> None:
+    def __init__(self, address: str) -> None:
+        super().__init__(address)
+
         self._shares = defaultdict(int)
         self._allowances = defaultdict(lambda: defaultdict(int))
 

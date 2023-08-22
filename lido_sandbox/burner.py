@@ -1,7 +1,12 @@
-class Burner:
-    def __init__(self) -> None:
-        pass
+from lido_sandbox.contract import Contract
+
+
+class Burner(Contract):
+    def __init__(self, address: str) -> None:
+        super().__init__(address)
 
     def request_burn_shares():
-        # TODO
+        pass
+
+    def commit_shares_to_burn():
         pass

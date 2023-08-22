@@ -1,4 +1,10 @@
-class PostTokenRebaseReceiver:
+from lido_sandbox.contract import Contract
+
+
+class PostTokenRebaseReceiver(Contract):
+    def __init__(self, address: str) -> None:
+        super().__init__(address)
+
     def handle_post_token_rebase(
         self,
         report_timestamp: int,

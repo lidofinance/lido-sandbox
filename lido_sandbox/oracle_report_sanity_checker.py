@@ -1,8 +1,12 @@
-from lido_sandbox.positve_token_rebase_limiter import PositiveTokenRebaseLimiter
-from lido_sandbox.objects import LimitsListPacked, TokenRebaseLimiterData
+from lido_sandbox.libs import PositiveTokenRebaseLimiter
+from lido_sandbox.objects import LimitsListPacked
+from lido_sandbox.contract import Contract
 
 
-class OracleReportSanityChecker:
+class OracleReportSanityChecker(Contract):
+    def __init__(self, address: str) -> None:
+        super().__init__(address)
+
     _limits = LimitsListPacked(
         churn_validators_per_day_limit=20000,
         one_off_cl_balance_decrease_bp_limit=500,

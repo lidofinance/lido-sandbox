@@ -4,11 +4,12 @@ from lido_sandbox.objects import (
     WithdrawalRequest,
     WithdrawalRequestStatus,
 )
+from lido_sandbox.contract import Contract
 from collections import defaultdict
 from time import time
 
 
-class WithdrawalQueue:
+class WithdrawalQueue(Contract):
     _is_bunker = False
     _queue: dict[int, WithdrawalRequest]
     _checkpoints: dict[int, Checkpoint]
@@ -23,7 +24,9 @@ class WithdrawalQueue:
     MAX_BATCHES_LENGTH: int = 36
     NOT_FOUND: int = 0
 
-    def __init__(self):
+    def __init__(self, address: str) -> None:
+        super().__init__(address)
+
         self._queue = defaultdict(lambda: WithdrawalRequest())
         self._checkpoints = defaultdict(lambda: Checkpoint())
         self._request_by_owner = defaultdict(set)

@@ -1,5 +1,10 @@
-class Locator:
-    def __init__(self):
+from lido_sandbox.contract import Contract
+
+
+class Locator(Contract):
+    def __init__(self, address: str) -> None:
+        super().__init__(address)
+
         from lido_sandbox.accounting_oracle import AccountingOracle
         from lido_sandbox.burner import Burner
         from lido_sandbox.el_rewards_vault import ElRewardsVault
@@ -11,19 +16,17 @@ class Locator:
         from lido_sandbox.withdrawal_queue import WithdrawalQueue
         from lido_sandbox.withdrawal_vault import WithdrawalVault
 
-        self.accounting_oracle = "accounting_oracle", AccountingOracle()
-        self.burner = "burner", Burner()
-        self.el_rewards_vault = "el_rewards_vault", ElRewardsVault()
-        self.lido = "lido", Lido(self)
-        self.oracle_report_sanity_checker = (
-            "oracle_report_sanity_checker",
-            OracleReportSanityChecker(),
+        self.accounting_oracle = AccountingOracle(address="accounting_oracle")
+        self.burner = Burner(address="burner")
+        self.el_rewards_vault = ElRewardsVault(address="el_rewards_vault")
+        self.lido = Lido(locator=self, address="lido")
+        self.oracle_report_sanity_checker = OracleReportSanityChecker(
+            address="oracle_report_sanity_checker"
         )
-        self.post_token_rebase_receiver = (
-            "post_token_rebase_receiver",
-            PostTokenRebaseReceiver(),
+        self.post_token_rebase_receiver = PostTokenRebaseReceiver(
+            address="post_token_rebase_receiver"
         )
-        self.staking_router = "staking_router", StakingRouter(self)
-        self.treasury = "treasury", Treasury()
-        self.withdrawal_queue = "withdrawal_queue", WithdrawalQueue()
-        self.withdrawal_vault = "withdrawal_vault", WithdrawalVault()
+        self.staking_router = StakingRouter(locator=self, address="staking_router")
+        self.treasury = Treasury(address="treasury")
+        self.withdrawal_queue = WithdrawalQueue(address="withdrawal_queue")
+        self.withdrawal_vault = WithdrawalVault(address="withdrawal_vault")
