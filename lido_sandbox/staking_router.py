@@ -36,10 +36,10 @@ class StakingRouter(Contract):
     def add_staking_module(
         self,
         name: str,
-        staking_module_address: str,
         target_share: int,
         staking_module_fee: int,
         treasury_fee: int,
+        staking_module: StakingModule,
     ) -> tuple[int, int]:
         assert target_share <= self.TOTAL_BASIS_POINTS
         assert staking_module_fee + treasury_fee <= self.TOTAL_BASIS_POINTS
@@ -50,13 +50,13 @@ class StakingRouter(Contract):
 
         for i in range(new_staking_module_index):
             assert (
-                staking_module_address
+                staking_module.address
                 != self._get_staking_module_by_index(i).staking_module_address
             )
 
         new_staking_module = StakingModuleData(
             self._last_staking_module_id + 1,
-            staking_module_address,
+            staking_module.address,
             staking_module_fee,
             treasury_fee,
             target_share,
@@ -71,9 +71,7 @@ class StakingRouter(Contract):
         )
         self._last_staking_module_id = new_staking_module.id
         self._staking_modules_count = new_staking_module_index + 1
-        self._staking_modules[staking_module_address] = StakingModule(
-            "some_type", self._locator, staking_module_address
-        )
+        self._staking_modules[staking_module.address] = staking_module
 
         return new_staking_module.id, new_staking_module_index
 
